@@ -1,0 +1,11 @@
+librosa==0.8.1
+torch==2.0.1
+transformers==4.37.2
+
+fastapi==0.95.1
+uvicorn==0.22.0
+websockets==11.0.3
+
+#rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+#rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+#yum install ffmpeg ffmpeg-devel
