@@ -1,17 +1,22 @@
 import uvicorn, os, shutil
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocket, WebSocketDisconnect
+import numpy as np
 from lnp.vocabraries import filter_forbidden
 from utils.soundprocessor import stt
 from utils.webSocket import notifier
 from routers import webSocketClient
 from utils.ini import (config, models, stt_processors)
 from utils.log_conf import app_log_conf
+from bs_sound_utils.realtime_room_stt import RealtimeSTT
+
+realtime_stt = RealtimeSTT(stt_processors['processor'], models['stt_model'])
 
 app = FastAPI(
     title="STT 기몬모델 API 서버",
     description="STT 테스트 서버입니다."
+    # lifespan=lifespan
 )
 app.add_middleware(
         CORSMiddleware,
@@ -45,7 +50,20 @@ async def stt_anal(file: UploadFile = File(...)):
     res = filter_forbidden(res)
     return {"file": file.filename, "result": res}
 
-
+@app.post("/v2401/stt/realtime/byte/{room_name}")
+async def realtime_stt_anal(request: Request, room_name: str):
+    '''
+    realtime stt
+    '''
+    if room_name not in realtime_stt.get_room_names():
+        realtime_stt.add_room(room_name)
+    byte_audio = await request.body()
+    res = realtime_stt.run(np.frombuffer(byte_audio, dtype=np.int16), room_name)
+    if res is not None:
+        res = filter_forbidden(res)
+        return {"result": res}
+    else:
+        return {"result": ""}
 
 # WebSocket 연결을 위한 라우트 추가
 @app.websocket("/ws/byte")
@@ -65,7 +83,6 @@ async def websocket_endpoint2(websocket: WebSocket):
             res = filter_forbidden(res)
             # response_data = {"data": res}  # 응답할 데이터를 딕셔너리 형태로 구성
             # print(res)
-
             await websocket.send_json(res)  # JSON 응답 전송
             # await notifier.push(response_data)
             if count < 20:

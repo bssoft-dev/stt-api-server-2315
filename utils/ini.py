@@ -9,7 +9,7 @@ sys.path.insert(1, config['dirs']['ml_path'])
 stt_model_path = "openai/whisper-medium"
 
 if config['ml']['device'] == 'gpu':
-    device = 'cuda'
+    device = 'cuda:1'
 else :
     device = 'cpu'
 

@@ -2,10 +2,12 @@ forbidden_sentences = [
     ' MBC 뉴스 김수근입니다.', 
     ' 안녕히계세요.', 
     ' 아', 
+    ' 아, 이거.',
     ' 감사합니다.', 
     ' 잘자요', 
     ' 끝', 
     ' 잘 먹었습니다.',
+    ' 고추',
     ' 고추장',
     ' 된장',
     ' 고춧가루',
@@ -21,10 +23,19 @@ forbidden_sentences = [
     ' 이제는 마트에 가서 먹으러 갈게요'
     ]
 
-forbidden_starts = [' 아 아 아 아 아 아 아 아', ' 마이크가 너무 작아서,']
+forbidden_starts = {' 아 아 아 아 아 아',
+                    ' 오오오오오오',
+                    ' 아, 아, 아, 아, 아, 아',
+                    ' 마이크가 너무 작아서,',
+                    ' 물이 많이 흐르고',
+                    ' 영상편집',
+                    ' 아, 진짜'
+                    ' 이곳은 전국의',
+                    ' 시청해주셔서',
+                    ' 아, 너무'}
 
 def filter_forbidden(text: str):
-    if text.startswith(forbidden_starts[0]) or text.startswith(forbidden_starts[1]):
+    if any(text.startswith(start) for start in forbidden_starts):
         return ''
     elif text in forbidden_sentences:
         return ''
