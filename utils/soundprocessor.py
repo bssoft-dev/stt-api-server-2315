@@ -2,7 +2,7 @@ import torch, librosa
 
 def predict(processors: dict, model, sr, wav_data):
     tmp = processors['processor'](wav_data, sampling_rate = sr, return_tensors='pt')
-    input_values = tmp.input_features.to('cuda')
+    input_values = tmp.input_features.to('cuda:1')
     with torch.no_grad():
         generated_ids = model.generate(input_values)
     pred = processors['processor'].batch_decode(generated_ids, skip_special_tokens=True)[0]
